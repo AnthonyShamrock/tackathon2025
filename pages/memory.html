@@ -312,12 +312,14 @@
             // End game Message
             grid.classList.add("hidden")
             message.classList.remove("hidden");
+            const canUnlockNextChapter = localStorage.getItem("chapter3Unlocked") === true
             message.innerHTML = `
                 🎉 Memory Complete!<br>
                 Moves: <b>${moves}</b><br>
                 Best: <b>${best}</b><br>
+            ${canUnlockNextChapter == true ? "Chapter 4 unlocked..." : "Check out \"Story\" VHS tape and try again"}
             `;
-            
+            if (canUnlockNextChapter) localStorage.setItem("chapter4Unlocked", "true");
             //Start game
             setTimeout(() => {
                 startButton.classList.remove("hidden")

@@ -154,8 +154,15 @@
     // End game after 20 seconds
     setTimeout(() => {
       gameActive = false;
+      let unlockedNextChapter = false
       clearTimeout(popTimer);
 
+      // Story line
+      if (score >= 10 && localStorage.getItem("chapter2Unlocked") === true) {
+        localStorage.setItem("chapter3Unlocked", "true");
+        unlockedNextChapter = true
+        showElf("You have unlocked chapter 3!")
+      }
       // New high score?
       if (score > topScore) {
         topScore = score
@@ -176,8 +183,7 @@
             document.querySelectorAll(".score-board").forEach((element)=>{element.classList.remove("hidden")})
             startButton.classList.remove("hidden")
         }, 3000) 
-        
-        showElf("You got a new high score!")
+        showElf(unlockedNextChapter==true ?  "You got a new high score! You have unlocked chapter 3!" : "You got a new high score!")
       }
 
 

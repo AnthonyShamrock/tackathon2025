@@ -1,38 +1,447 @@
 <div class="vhs-page">
-  <p id="story-text"></p>
+    <h2 class="story-title">North Pole Detective Board</h2>
+
+    <div class="case-layout">
+
+        <!-- CHAPTER LIST -->
+        <div class="panel">
+            <h3>Case Files</h3>
+            <div class="list">
+                <button class="item" data-type="chapter" data-id="1" id="chapter1-btn">Chapter 1 <span
+                        id="c1-status"></span></button>
+                <button class="item locked" data-type="chapter" data-id="2" id="chapter2-btn" disabled>Chapter 2 <span
+                        id="c2-status"></span></button>
+                <button class="item locked" data-type="chapter" data-id="3" id="chapter3-btn" disabled>Chapter 3 <span
+                        id="c3-status"></span></button>
+                <button class="item locked" data-type="chapter" data-id="4" id="chapter4-btn" disabled>Chapter 4 <span
+                        id="c4-status"></span></button>
+                <button class="item locked" data-type="chapter" data-id="5" id="chapter5-btn" disabled>Chapter 5 <span
+                        id="c5-status"></span></button>
+            </div>
+        </div>
+
+        <!-- SUSPECT PANEL -->
+        <div class="panel">
+            <h3>Suspects</h3>
+            <div class="list">
+                <button class="item" data-type="suspect" data-id="glint" id="suspect-glint">Glint (Missing Elf)</button>
+                <button class="item locked" data-type="suspect" data-id="toy" id="suspect-toy" disabled>Prototype
+                    Toy</button>
+                <button class="item locked" data-type="suspect" data-id="unknown" id="suspect-unknown" disabled>Unknown
+                    Figure</button>
+                <button class="item locked" data-type="suspect" data-id="gearbox" id="suspect-gearbox"
+                    disabled>Gearbox</button>
+            </div>
+        </div>
+
+        <!-- CLUES PANEL -->
+        <div class="panel">
+            <h3>Evidence</h3>
+            <div class="list">
+                <button class="item" data-type="clue" data-id="cane" id="clue-cane">Broken Candy Cane</button>
+                <button class="item locked" data-type="clue" data-id="tape" id="clue-tape" disabled>Forbidden VHS
+                    Tape</button>
+                <button class="item locked" data-type="clue" data-id="fabric" id="clue-fabric" disabled>Scrap of
+                    Uniform</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="story-box">
+        <p id="story-text"></p>
+        <div id="suspect-select" class="suspect-select hidden">
+            <h3>Who do you think is responsible?</h3>
+
+            <div class="suspect-buttons">
+                <button data-suspect="glint">Glint (Missing Elf)</button>
+                <button data-suspect="toy">Prototype Toy #07</button>
+                <button data-suspect="unknown">Unknown Tunnel Figure</button>
+                <button data-suspect="gearbox">Gearbox (Maintenance Elf)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chapter-instructions">
+        Complete minigames to unlock more case files, clues, and suspects.
+    </div>
 </div>
 
+<style>
+    .screen::-webkit-scrollbar {
+        width: 6px;
+        /* thinner */
+    }
+
+    .screen::-webkit-scrollbar-track {
+        background: #000;
+        border-left: 1px solid #003300;
+    }
+
+    .screen::-webkit-scrollbar-thumb {
+        background: #39ff14;
+        box-shadow: 0 0 6px #39ff14;
+        border-radius: 4px;
+        border: 1px solid #0f0;
+    }
+
+    .screen::-webkit-scrollbar-thumb:hover {
+        background: #66ff66;
+        box-shadow: 0 0 10px #66ff66;
+    }
+
+    .screen {
+        display: block !important;
+        overflow-y: auto !important;
+        align-items: unset !important;
+        justify-content: unset !important;
+        padding: 0;
+    }
+
+    .vhs-page {
+        padding: 15px;
+        font-family: monospace;
+        color: #39ff14;
+        text-shadow: 0 0 6px #39ff14;
+    }
+
+    .case-layout {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .panel {
+        flex: 1;
+        border: 2px solid #39ff14;
+        padding: 10px;
+        background: #000;
+    }
+
+    .list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .item {
+        background: #111;
+        border: 1px solid #39ff14;
+        color: #39ff14;
+        padding: 8px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: left;
+    }
+
+    .item.locked {
+        opacity: 0.4;
+        cursor: not-allowed;
+        border-color: #555;
+    }
+
+    .story-box {
+        border: 2px solid #39ff14;
+        padding: 10px;
+        height: 230px;
+        overflow-y: auto;
+        background: #000;
+    }
+
+    .suspect-select {
+        margin-top: 20px;
+        padding: 15px;
+        border: 2px solid var(--vhs-green, #33ff33);
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .suspect-select.hidden {
+        display: none;
+    }
+
+    .suspect-select h3 {
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+        color: var(--vhs-green, #33ff33);
+    }
+
+    .suspect-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .suspect-buttons button {
+        background: black;
+        border: 1px solid var(--vhs-green, #33ff33);
+        padding: 10px;
+        cursor: pointer;
+        color: var(--vhs-green, #33ff33);
+        font-family: inherit;
+        font-size: 1rem;
+    }
+
+    .suspect-buttons button:hover {
+        background: var(--vhs-green, #33ff33);
+        color: black;
+    }
+</style>
+
 <script>
-(function(){
-    const storyLines = [
-        "Once upon a 90s holiday..."
-    ];
+    (function () {
 
-    const storyTextEl = document.getElementById("story-text");
-    let lineIndex = 0;
+        const storyTextEl = document.getElementById("story-text");
+        const suspectUI = document.getElementById("suspect-select");
+        let isTypingLines = false
 
-    function typeLine(line, callback) {
-        let i = 0;
-        storyTextEl.textContent = "";
-        function typeChar() {
-            if (i < line.length) {
-                storyTextEl.textContent += line.charAt(i);
-                i++;
-                setTimeout(typeChar, 75);
-            } else {
-                setTimeout(callback, 1500);
+        // Unlock flags
+        const unlocks = {
+            chapter2: localStorage.getItem("chapter2Unlocked") === "true",
+            chapter3: localStorage.getItem("chapter3Unlocked") === "true",
+            chapter4: localStorage.getItem("chapter4Unlocked") === "true",
+            chapter5: localStorage.getItem("chapter5Unlocked") === "true",
+
+            // Clues
+            clueTape: localStorage.getItem("chapter3Unlocked") === "true",
+            clueFabric: localStorage.getItem("chapter4Unlocked") === "true",
+
+            // Suspects
+            suspectGearbox: localStorage.getItem("chapter2Unlocked") === "true",
+            suspectToy: localStorage.getItem("chapter3Unlocked") === "true",
+            suspectUnknown: localStorage.getItem("chapter4Unlocked") === "true"
+        };
+
+        function applyUnlock(id, unlocked) {
+            const el = document.getElementById(id);
+            if (unlocked) {
+                el.classList.remove("locked");
+                el.disabled = false;
             }
         }
-        typeChar();
-    }
 
-    function loopStory() {
-        typeLine(storyLines[lineIndex], () => {
-            lineIndex = (lineIndex + 1) % storyLines.length;
-            loopStory();
+        // Apply unlock rules
+        applyUnlock("chapter2-btn", unlocks.chapter2);
+        applyUnlock("chapter3-btn", unlocks.chapter3);
+        applyUnlock("chapter4-btn", unlocks.chapter4);
+        applyUnlock("chapter5-btn", unlocks.chapter5);
+
+        applyUnlock("clue-tape", unlocks.clueTape);
+        applyUnlock("clue-fabric", unlocks.clueFabric);
+
+        applyUnlock("suspect-toy", unlocks.suspectToy);
+        applyUnlock("suspect-unknown", unlocks.suspectUnknown);
+        applyUnlock("suspect-gearbox", unlocks.suspectGearbox);
+
+        // All text content
+        const CHAPTERS = {
+            1: [
+                "Case File 1: The Case Begins",
+                "Cold night at the North Pole.",
+                "Lights flickered. Santa looked rattled.",
+                "An elf vanished. Name: Glint.",
+                "I took the badge he dropped.",
+                "The case had begun.",
+                "Talk with Santa and ask 'What really happened to Glint?'"
+            ],
+            2: [
+                "Case File 2: Glint’s Last Footsteps",
+                "Snow dusted the workshop floor. Enough to catch faint prints.",
+                "Glint moved fast. Too fast for someone who hated the cold.",
+                "The trail led past the assembly tables into the restricted corridor.",
+                "Something scraped along the walls. Metal? Tools? Claws?",
+                "A broken candy-striped wrench lay on the floor. Glint’s initials were on the handle.",
+                "Then the prints stopped. Right at a vent grate.",
+                "Warm air rushed out. Too warm.",
+                "Something is crawling beneath the workshop.",
+                "Whatever took Glint might still be down there.",
+                "I need access to the vent system. The maintenance elves can help…",
+                "If they are still behaving.",
+                "Head to Maintenance Bay B and deal with the unstable elves.",
+                "Play Whack-a-elf and score above a 10 to unlock next chapter!"
+            ],
+            3: [
+                "Case File 3: The Vent Disturbance",
+                "Maintenance Bay B was in chaos.",
+                "Elves popped out of floor vents at random, disoriented and glitching.",
+                "Their eyes flickered like toy units stuck between power cycles.",
+                "Something beneath the workshop is affecting them.",
+                "One elf managed to mutter a warning before collapsing:",
+                "\"Look... for the pieces... he left behind...\"",
+                "Near the largest vent grille, I found scraps of patterned cards.",
+                "Not toys. Not workshop designs.",
+                "Fragments of a memory puzzle — the kind Glint used to make when he logged inventory.",
+                "If I reassemble the pattern, I might recover his last message.",
+                "Time to reconstruct the cards he left behind.",
+                "Complete Memory Match to unlock next chapter"
+            ],
+            4: [
+                "Case File 4: Glint’s Message",
+                "The pieces I recovered were more than scraps.",
+                "Glint left a pattern of short notes, each one rushed and uneven.",
+                "They described the humming beneath the workshop growing louder.",
+                "One note said something was moving through the vents at night.",
+                "Another warned that the old chamber was waking up again.",
+                "The last piece was different from the rest.",
+                "It showed the hatch entrance, marked with deep scratches.",
+                "Below it, Glint wrote a single warning:",
+                "\"Do not open it alone.\"",
+                "Whatever he discovered frightened him.",
+                "Before I go any further, I need to speak with Santa again.",
+                "Glint’s final warning keeps echoing in my head. I need to repeat it to Santa."
+            ],
+            5: [
+                "Case File 5: The Final Briefing",
+                "Santa waited for me in the workshop office. The lights were low and still.",
+                "He rested Glint’s notes on the desk between us.",
+                "\"Before I tell you what truly happened,\" he said,",
+                "\"I want to hear your conclusion first.\"",
+                "\"Who do you think is responsible for what happened to Glint?\"",
+                "I need to choose a suspect."
+            ],
+            // Reminder of chapter 5
+            6: [
+                "Santa looked down at Glint’s notes laid across the desk.",
+                "\"You’ve seen enough to understand what frightened him,\" Santa said softly.",
+                "\"Years ago, before this workshop was built, we tested automated helpers below the floor.\"",
+                "\"The first one was Unit Zero. Too strong. Too unpredictable.\"",
+                "It malfunctioned and lashed out during a test.",
+                "The elves sealed it away and locked the old chamber.",
+                "\"But the humming you heard… the scratches… the flickering lights…\"",
+                "\"Unit Zero has been waking up again.\"",
+                "Glint discovered the early signs and tried to warn us.",
+                "\"Because of you, detective,\" Santa said, \"we can shut the old system down before it becomes dangerous again.\"",
+                "As he spoke, the workshop lights steadied. The humming faded.",
+                "Whatever had awakened… had gone silent again.",
+                "Case closed. For now."
+            ]
+        }
+
+        const SUSPECTS = {
+            glint: [
+                "Glint the Missing Elf",
+                "Role: Inventory specialist.",
+                "Reliable. Accurate. Never late.",
+                "Last seen entering the storage tunnels.",
+                "Reported a strange humming before vanishing."
+            ],
+            toy: [
+                "Prototype Toy Unit #07",
+                "Old experimental robot.",
+                "Decommissioned years ago.",
+                "Reactivated on the night Glint disappeared.",
+                "May be responding to something beneath the workshop."
+            ],
+            unknown: [
+                "Unknown Tunnel Figure",
+                "Shadow seen on forbidden VHS footage.",
+                "Stands near the hatch Glint discovered.",
+                "Height and shape do not match any registered elf.",
+                "Identity unclear: glitch, intruder, or something older."
+            ],
+            gearbox: [
+                "Gearbox the Maintenance Elf",
+                "Responsible for vent repairs.",
+                "Reported tools missing last week.",
+                "Nervous around the hatch area.",
+                "Claims he “heard whispers” beneath the floor."
+            ]
+        };
+
+        const CLUES = {
+            cane: [
+                "Broken Candy Cane Tool",
+                "Found near Glint’s workstation.",
+                "The tip is snapped clean.",
+                "Break pattern suggests sudden impact or fear."
+            ],
+            tape: [
+                "Forbidden VHS Tape",
+                "Label: 'DO NOT PLAY'.",
+                "Footage captures Glint delivering a warning.",
+                "He glances back at something glowing behind him."
+            ],
+            fabric: [
+                "Scrap of Uniform",
+                "Caught on a nail inside the vent corridor.",
+                "Fabric color matches Glint’s tunic.",
+                "Confirms he reached the hatch chamber."
+            ]
+        };
+
+
+        // Typewriter effect
+        function typeLines(lines, callback) {
+            if (isTypingLines) {
+                isTypingLines = lines;
+                return;
+            }
+            isTypingLines = false;
+            let index = 0;
+            storyTextEl.textContent = "";
+
+            function typeLine() {
+                if (index >= lines.length) { if (callback) callback(); if (isTypingLines) typeLines(isTypingLines); return; }
+                let i = 0;
+                let line = lines[index];
+                let buffer = "";
+
+                function typeChar() {
+                    if (i < line.length) {
+                        buffer += line[i];
+                        storyTextEl.textContent = buffer;
+                        i++;
+                        setTimeout(typeChar, 75);
+                    } else {
+                        storyTextEl.textContent += "\n";
+                        index++;
+                        setTimeout(typeLine, 1500);
+                    }
+                }
+
+                typeChar();
+            }
+            typeLine();
+        }
+
+        suspectReaction = {
+            "glint": "Santa: Glint? No… he tried to protect us. He found the danger first.",
+            "toy": "Santa: Unit Zero Seven malfunctioned, yes… but it was reacting to something deeper.",
+            "unknown": "Santa: The figure in the tunnel was running from the noise, not causing it.",
+            "gearbox": "Santa: Gearbox is skittish, but harmless. His fear was a warning, not guilt."
+        }
+
+        function show(type, id) {
+            if (type === "chapter") typeLines(CHAPTERS[id], id == 5 ? () => { suspectUI.classList.remove("hidden") } : null);
+            if (type === "suspect") typeLines(SUSPECTS[id]);
+            if (type === "clue") typeLines(CLUES[id]);
+        }
+
+        // Handle suspect selection
+        document.querySelectorAll("#suspect-select button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const suspect = btn.dataset.suspect;
+                localStorage.setItem("playerSuspectGuess", suspect);
+
+                suspectUI.classList.add("hidden");
+
+                typeLines([suspectReaction[suspect]]);
+
+                setTimeout(() => {
+                    show("chapter", 6);
+                }, 2500);
+            });
         });
-    }
 
-    typeLine("🎄 The Christmas Story", loopStory)
-})();
+        // Button clicks
+        document.querySelectorAll(".item").forEach(btn => {
+            if (!btn.disabled) {
+                btn.addEventListener("click", () => {
+                    const type = btn.dataset.type;
+                    const id = btn.dataset.id;
+                    show(type, id);
+                });
+            }
+        });
+
+    })();
 </script>
