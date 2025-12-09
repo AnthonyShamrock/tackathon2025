@@ -193,6 +193,7 @@
         const storyTextEl = document.getElementById("story-text");
         const suspectUI = document.getElementById("suspect-select");
         let isTypingLines = false
+        let nextLines = null
 
         // Unlock flags
         const unlocks = {
@@ -374,17 +375,17 @@
         // Typewriter effect
         function typeLines(lines, callback) {
             if (isTypingLines) {
-                isTypingLines = lines;
+                nextLines = lines;
                 return;
             }
-            isTypingLines = false;
+            isTypingLines = true
             let index = 0;
             storyTextEl.innerHTML = ""; // clear only at the start of a chapter
             //storyTextEl.textContent = "";
            
 
             function typeLine() {
-                if (index >= lines.length) { if (callback) callback(); if (isTypingLines) typeLines(isTypingLines); return; }
+                if (index >= lines.length) { isTypingLines = false; if (callback) callback(); if (nextLines) typeLines(nextLines); return; }
                 const lineEl = document.createElement("div");
                 lineEl.classList.add("story-line");
                 storyTextEl.appendChild(lineEl);
@@ -396,7 +397,7 @@
                 function typeChar() {
                     if (i < line.length) {
                         buffer += line[i];
-                        storyTextEl.parentElement.scrollTop =  storyTextEl.parentElement.scrollHeight
+                        storyTextEl.parentElement.scrollTop =  storyTextEl.parentElement.scrollh
                         lineEl.textContent = buffer;
                         i++;
                         setTimeout(typeChar, 75);
