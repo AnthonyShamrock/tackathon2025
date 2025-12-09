@@ -1,0 +1,49 @@
+<div class="vhs-page">
+    <p id="tv-text"></p>
+</div>
+
+<script>
+(function(){
+    const storyLines = [
+        "Santa is Calling!",
+        "Dial 72682 to talk to Santa! Dial 000000 to exit or eject VHS!"
+    ];
+
+    const tvTextEl = document.getElementById("tv-text");
+    let lineIndex = 0;
+
+    function typeLine(line, callback) {
+        let i = 0;
+        tvTextEl.textContent = "";
+        function typeChar() {
+            if (i < line.length) {
+                tvTextEl.textContent += line.charAt(i);
+                i++;
+                setTimeout(typeChar, 75);
+            } else {
+                setTimeout(callback, 1500);
+            }
+        }
+        typeChar();
+    }
+
+    function loopStory() {
+        // Check to see current tape is the same
+        if (!currentTape || currentTape.querySelector('.vhs-label').textContent.toLowerCase() !== "santa") {
+            return; // stop if the tape changed
+        } 
+        // Last line? Load phone!
+        if (lineIndex >= storyLines.length) {
+            loadEvent("phone")
+            return;
+        }
+        // Loop thru lines!
+        typeLine(storyLines[lineIndex], () => {
+            lineIndex = (lineIndex + 1);
+            loopStory()
+        });
+    }
+    playEffect("rotaryPhoneRing") // Ring!
+    loopStory()
+})();
+</script>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>90s Christmas VHS</title>
+<style>
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #0c0c0c, #050505);
+    font-family: "Courier New", monospace;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== Wooden Shelf (VHS Nav) ===== */
+  .shelf {
+    width: 100%;
+    height: 150px;
+    background: linear-gradient(to bottom, #6b4c2a, #4b3318);
+    box-shadow: inset 0 -10px 15px rgba(0,0,0,0.7), 0 5px 8px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 25px;
+    padding-bottom: 20px;
+    position: relative;
+    z-index: 10;
+    border-bottom: 4px solid #3c2a14;
+    border-radius: 0 0 10px 10px;
+  }
+
+  .vhs {
+    width: 120px;
+    height: 70px;
+    background: linear-gradient(to bottom, #222 0%, #000 100%);
+    border: 3px solid #111;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .vhs::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    top: 8px;
+    width: 28px;
+    height: 50px;
+    background: linear-gradient(to bottom, #777, #444);
+    border-radius: 2px;
+  }
+
+  .vhs-label {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    width: 60px;
+    height: 50px;
+    background: #eee;
+    color: #111;
+    font-size: 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 2px;
+    word-wrap: break-word;
+  }
+
+  .vhs:hover {
+    transform: translateY(-10px);
+  }
+
+  /* ===== TV & Antennas ===== */
+  .tv-container {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .antenna {
+    position: absolute;
+    width: 4px;
+    height: 100px;
+    background: #aaa;
+    top: -110px;
+    border-radius: 2px;
+  }
+  .antenna.left { left: 100px; transform: rotate(-25deg); }
+  .antenna.right { right: 100px; transform: rotate(25deg); }
+
+  .tv {
+    width: 750px;
+    height: 500px;
+    border: 20px solid #333;
+    border-radius: 20px;
+    background: #000;
+    box-shadow: inset 0 0 50px #000, 0 10px 30px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .screen {
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        rgba(60, 255, 60, 0.1) 0,
+        rgba(60, 255, 60, 0.1) 2px,
+        rgba(0,0,0,0.15) 2px,
+        rgba(0,0,0,0.15) 4px
+      ),
+      radial-gradient(circle at center, #222 0%, #000 100%);
+    animation: staticMove 0.15s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #39ff14;
+    text-shadow: 0 0 5px #39ff14;
+    font-size: 1.8rem;
+    padding: 10px;
+    text-align: center;
+    overflow-y: auto;
+  }
+
+  @keyframes staticMove {
+    0% {background-position: 0 0, 0 0;}
+    100% {background-position: 0 4px, 0 0;}
+  }
+
+  /* ===== VHS Player ===== */
+  .player {
+    width: 550px;
+    height: 110px;
+    background: linear-gradient(to bottom, #222, #111);
+    border-radius: 10px;
+    box-shadow: inset 0 0 20px #000, 0 -4px 12px rgba(0,0,0,0.8);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 25px;
+    margin-top: -10px;
+  }
+
+  .slot {
+    width: 340px;
+    height: 20px;
+    background: #000;
+    border-radius: 5px;
+    box-shadow: inset 0 0 6px #222;
+    position: relative;
+  }
+
+  .eject-btn {
+    width: 25px;
+    height: 25px;
+    background: #555;
+    border-radius: 4px;
+    position: absolute;
+    right: 10px;
+    top: -5px;
+    box-shadow: inset 0 2px 4px #000;
+    cursor: pointer;
+  }
+
+  .led {
+    position: absolute;
+    bottom: 20px;
+    right: 45px;
+    width: 12px;
+    height: 12px;
+    background: red;
+    border-radius: 50%;
+    box-shadow: 0 0 10px red;
+    animation: blink 1s infinite alternate;
+  }
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
+
+  /* ===== VHS Insert Animation ===== */
+  .vhs.clone {
+    position: fixed;
+    z-index: 20;
+    animation: insertTape 1.6s cubic-bezier(0.42,0,0.58,1) forwards;
+  }
+
+  @keyframes insertTape {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    40% { transform: translateY(180px) scale(1.1); }
+    100% { transform: translate(0, 450px) scale(0.9); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shelf">
+  <div class="vhs" data-content="📺 Welcome to the 90s Christmas!">
+    <div class="vhs-label">Home</div>
+  </div>
+  <div class="vhs" data-content="🎄 The Christmas Story goes here.">
+    <div class="vhs-label">Story</div>
+  </div>
+  <div class="vhs" data-content="🎁 Holiday Challenges and Fun!">
+    <div class="vhs-label">Challenges</div>
+  </div>
+  <div class="vhs" data-content="📸 Retro Gallery of the Holidays.">
+    <div class="vhs-label">Gallery</div>
+  </div>
+</div>
+
+<div class="tv-container">
+  <div class="antenna left"></div>
+  <div class="antenna right"></div>
+  <div class="tv">
+    <div class="screen" id="screen">📼 Insert a VHS Tape...</div>
+  </div>
+</div>
+
+<div class="player">
+  <div class="slot"></div>
+  <div class="eject-btn"></div>
+  <div class="led"></div>
+</div>
+
+<script>
+  const tapes = document.querySelectorAll(".vhs");
+  const screen = document.getElementById("screen");
+
+  tapes.forEach(tape => {
+    tape.addEventListener("click", () => {
+      const clone = tape.cloneNode(true);
+      document.body.appendChild(clone);
+      clone.classList.add("clone");
+
+      setTimeout(() => {
+        clone.remove();
+        screen.textContent = "🔄 Loading Tape...";
+        setTimeout(() => {
+          screen.textContent = tape.dataset.content;
+        }, 1000);
+      }, 1600);
+    });
+  });
+
+  // optional: eject button clears screen
+  const ejectBtn = document.querySelector(".eject-btn");
+  ejectBtn.addEventListener("click", () => {
+    screen.textContent = "📼 Insert a VHS Tape...";
+  });
+</script>
+</body>
+</html>

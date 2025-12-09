@@ -1,0 +1,329 @@
+<style>
+    .memory-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 15px;
+        text-align: center;
+    }
+
+    #start-memory {
+        background: #39ff14;
+        color: #000;
+        padding: 10px 25px;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 0 0 5px #39ff14;
+    }
+
+    .memory-stats {
+        color: #39ff14;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: block;
+        text-shadow: 0 0 8px #39ff14;
+    }
+
+    /* GRID */
+    .memory-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 100px);
+        gap: 20px;
+        justify-content: center;
+    }
+
+    /* CARD */
+    .card {
+        width: 100px;
+        height: 100px;
+        perspective: 600px;
+        cursor: pointer;
+    }
+
+    .card-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.45s ease;
+        transform-style: preserve-3d;
+    }
+
+    .card.flip .card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .card-front,
+    .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 10px;
+        backface-visibility: hidden;
+    }
+
+    /* BACK OF CARD (hidden side) */
+    .card-back {
+        background: #111;
+        border: 2px solid #333;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform: rotateY(180deg);
+    }
+
+    .card-back img {
+        width: 60%;
+        user-select: none;
+        -webkit-user-drag: none;
+        draggable: false;
+    }
+
+    /* FRONT (icon or image) */
+    .card-front {
+        background: #39ff14;
+        font-size: 2.2rem;
+        color: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: 2px solid #333;
+    }
+
+    #memory-message {
+        margin-top: 25px;
+        color: #39ff14;
+        font-size: 1.5rem;
+        display: block;
+        text-shadow: 0 0 8px #39ff14;
+    }
+    /* RIGHT MATCH = green flash */
+    .card.match .card-front {
+        animation: matchPulse 0.4s ease;
+        background: #3bff3b !important;
+    }
+
+    @keyframes matchPulse {
+        0%   { transform: scale(1);    box-shadow: 0 0 0px #fff; }
+        40%  { transform: scale(1.18); box-shadow: 0 0 14px #fff; }
+        100% { transform: scale(1);    box-shadow: 0 0 0px #fff; }
+    }
+
+    /* WRONG MATCH = shake animation */
+    .card.wrong {
+        animation: wrongShake 0.45s ease;
+    }
+
+    @keyframes wrongShake {
+        0% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-8px);
+        }
+
+        50% {
+            transform: translateX(8px);
+        }
+
+        75% {
+            transform: translateX(-8px);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+<div class="vhs-page">
+    <div class=" memory-container">
+
+        <button id="start-memory">Start Memory Match</button>
+
+        <div class="memory-stats">
+            Moves: <span id="moves">0</span> |
+            Best: <span id="best">0</span>
+        </div>
+
+        <div class="memory-grid hidden" id="memory-grid"></div>
+
+        <div class="hidden" id="memory-message"></div>
+
+    </div>
+</div>
+
+
+<script>
+    (function () {
+
+        // Classic memory match symbols
+        const symbols = [
+            "🎄", "🎅", "⛄", "❄️",
+            "🎁", "⭐", "🧦", "🛷"
+        ];
+
+        const highScoreElfMessage = [
+            "Wow! Your memory is brilliant!",
+            "You've got a memory sharper than a candy cane!",
+            "Your memory is truly magical!",
+            "Amazing! Your memory is top-tier!",
+            "Your memory shines brighter than Christmas lights!",
+            "You’re a real memory master!",
+            "Incredible! You remembered everything!",
+            "That memory could impress Santa himself!",
+            "You remember better than our top elf librarian!",
+            "Snow-stopping memory skills!",
+            "You’ve unlocked Elite Elf Memory!",
+            "Your memory is as sweet as gingerbread!",
+            "Outstanding! You nailed it!",
+            "Your memory powers are truly legendary!"
+        ]
+
+
+        let firstCard = null;
+        let lockBoard = true;
+        let moves = 0;
+        let matched = 0;
+        let deck = [];
+
+        const startButton = document.getElementById("start-memory");
+        const grid = document.getElementById("memory-grid");
+        const statsBox = document.querySelector(".memory-stats");
+        const movesElement = document.getElementById("moves");
+        const bestElement = document.getElementById("best");
+        const message = document.getElementById("memory-message");
+
+        // Load best score
+        let best = localStorage.getItem("memoryMatchBest") || 0
+        bestElement.textContent = best;
+
+
+        startButton.addEventListener("click", () => {
+            startButton.classList.add("hidden")
+            statsBox.classList.remove("hidden");
+            grid.classList.remove("hidden");
+            startGame();
+        });
+
+        function startGame() {
+            moves = 0;
+            matched = 0;
+            movesElement.textContent = "0";
+            grid.innerHTML = "";
+
+            // Board is locked until cards are flipped
+            setTimeout(() => {
+                lockBoard = false
+            }, 3000)
+            
+            // Add Icons
+            deck = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+
+            deck.forEach(icon => {
+                const card = document.createElement("div");
+                card.className = "card";
+                card.dataset.icon = icon;
+
+                card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-front">${icon}</div>
+          <div class="card-back">
+            <img src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false">
+          </div>
+        </div>
+      `;
+
+                card.addEventListener("click", () => flipCard(card));
+                // Flip card to hide icon after a few seconds
+                setTimeout(() => {
+                    card.classList.add("flip");
+                }, 3000)
+                // Add to Grid!
+                grid.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (lockBoard) return;
+            if (card.classList.contains("flip") == false) return;
+
+            card.classList.remove("flip");
+
+            if (!firstCard) {
+                firstCard = card;
+                return;
+            }
+
+            moves++;
+            movesElement.textContent = moves;
+
+            checkMatch(card);
+        }
+
+        function checkMatch(secondCard) {
+            lockBoard = true;
+            const match = firstCard.dataset.icon === secondCard.dataset.icon;
+
+            function animateCard(matches) {
+                className = matches ? "match" : "wrong"
+                firstCard.classList.add(className);
+                secondCard.classList.add(className);
+                setTimeout(()=>{
+                    if (!firstCard) return;
+                    firstCard.classList.remove(className);
+                    secondCard.classList.remove(className);
+                }, 1000)
+            }
+
+            if (match) {
+                animateCard(true)
+                matched += 2;
+                firstCard = null;
+                lockBoard = false;
+
+                if (matched === grid.childElementCount) endGame();
+            } else {
+                animateCard(false)
+                // unflip both
+                setTimeout(() => {
+                    firstCard.classList.add("flip");
+                    secondCard.classList.add("flip");
+                    firstCard = null;
+                    lockBoard = false;
+                }, 800);
+            }
+        }
+
+        function endGame() {
+            if (best === 0 || moves < best) {
+                best = moves;
+                bestElement.textContent = best;
+                localStorage.setItem("memoryMatchBest", best);
+                showElf(highScoreElfMessage[Math.floor(Math.random() * highScoreElfMessage.length)]);
+            }
+            // End game Message
+            grid.classList.add("hidden")
+            message.classList.remove("hidden");
+            message.innerHTML = `
+                🎉 Memory Complete!<br>
+                Moves: <b>${moves}</b><br>
+                Best: <b>${best}</b><br>
+            `;
+            
+            //Start game
+            setTimeout(() => {
+                startButton.classList.remove("hidden")
+                message.classList.add("hidden");
+            }, 4000);
+        }
+
+    })();
+</script>

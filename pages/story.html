@@ -1,0 +1,38 @@
+<div class="vhs-page">
+  <p id="story-text"></p>
+</div>
+
+<script>
+(function(){
+    const storyLines = [
+        "Once upon a 90s holiday..."
+    ];
+
+    const storyTextEl = document.getElementById("story-text");
+    let lineIndex = 0;
+
+    function typeLine(line, callback) {
+        let i = 0;
+        storyTextEl.textContent = "";
+        function typeChar() {
+            if (i < line.length) {
+                storyTextEl.textContent += line.charAt(i);
+                i++;
+                setTimeout(typeChar, 75);
+            } else {
+                setTimeout(callback, 1500);
+            }
+        }
+        typeChar();
+    }
+
+    function loopStory() {
+        typeLine(storyLines[lineIndex], () => {
+            lineIndex = (lineIndex + 1) % storyLines.length;
+            loopStory();
+        });
+    }
+
+    typeLine("🎄 The Christmas Story", loopStory)
+})();
+</script>

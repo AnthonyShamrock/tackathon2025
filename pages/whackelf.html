@@ -1,0 +1,189 @@
+<style>
+  .whack-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .message {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #39ff14;
+    text-shadow: 0 0 10px #39ff14;
+    padding: 20px;
+  }
+
+  .hole {
+    width: 120px;
+    height: 120px;
+    background: #222;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    box-shadow: inset 0 0 20px #000;
+  }
+
+  .game-elf {
+    position: absolute;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    transition: bottom 0.2s;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: auto; /* still clickable */
+  }
+
+  .score-board {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #39ff14;
+    text-shadow: 0 0 10px #39ff14;
+  }
+
+  .start-btn {
+    background: #39ff14;
+    color: #000;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .start-btn:hover {
+    filter: brightness(1.2);
+  }
+  .hidden {
+    display: none;
+  }
+</style>
+<div class="vhs-page">
+    <div class="score-board">Your Top Score: <span id="top-score">0</span></div>
+    <div class="score-board">Your Latest Score: <span id="score">0</span></div>
+    <div class="start-btn" id="start-btn">Start Game</div>
+    
+    <div class="message hidden"></div>
+    <div class="whack-container hidden">
+    <div class="hole"><img class="game-elf" src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false"></div>
+    <div class="hole"><img class="game-elf" src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false"></div>
+    <div class="hole"><img class="game-elf" src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false"></div>
+    <div class="hole"><img class="game-elf" src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false"></div>
+    <div class="hole"><img class="game-elf" src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false"></div>
+    <div class="hole"><img class="game-elf" src="https://cdn-icons-png.freepik.com/512/2224/2224757.png" draggable="false"></div>
+    </div>
+</div>
+<script>
+(function(){
+  const whackContainer = document.querySelector(".whack-container")
+  const message = document.querySelector(".message")
+  const holes = document.querySelectorAll(".hole");
+  const topScoreElement = document.getElementById("top-score");
+  const scoreElement = document.getElementById("score");
+  const startButton = document.getElementById("start-btn");
+  //Score
+  let topScore = localStorage.getItem("whackTopScore") || 0;
+  let score = 0;
+  
+  // Game Variables
+  let gameActive = false;
+  let popTimer = null;
+
+
+  // initalize ui
+  topScoreElement.textContent = topScore;
+
+  // Get Random Hole
+  function randomHole() {
+    return holes[Math.floor(Math.random() * holes.length)];
+  }
+
+  // Pop elf to whack
+  function popElf() {
+    if (!gameActive) return;
+
+    const hole = randomHole();
+    const holeElf = hole.querySelector(".game-elf");
+
+    // Pop up
+    holeElf.style.bottom = "0px";
+
+    // Hide after short time
+    setTimeout(() => {
+      holeElf.style.bottom = "-100px";
+    }, 600);
+
+    // Next pop
+    popTimer = setTimeout(popElf, 700 + Math.random() * 500);
+  }
+
+  // initialize holes
+  holes.forEach(hole => {
+    const elf = hole.querySelector(".game-elf");
+
+    function wack() {
+        if (!gameActive) return; // is active game?
+        if (elf.style.bottom === "0px") {
+            score++;
+            scoreElement.textContent = score;
+            elf.style.bottom = "-100px"
+      } 
+    }
+    
+    hole.addEventListener("click", wack)
+    elf.addEventListener("click", wack)
+  });
+
+  // initalize start button
+  startButton.addEventListener("click", () => {
+    if (gameActive) return;
+
+    score = 0;
+    scoreElement.textContent = score;
+
+    gameActive = true;
+    startButton.textContent = "Playing...";
+    whackContainer.classList.remove("hidden")
+    popElf();
+
+    // End game after 20 seconds
+    setTimeout(() => {
+      gameActive = false;
+      clearTimeout(popTimer);
+
+      // New high score?
+      if (score > topScore) {
+        topScore = score
+        topScoreElement.textContent = topScore
+        localStorage.setItem("whackTopScore", topScore);
+
+        // Show top score messsage!
+        message.classList.remove("hidden")
+        message.textContent = `NEW HIGH SCORE!\nTop Score: ${topScore}`
+
+        // Hide start button and score board
+        document.querySelectorAll(".score-board").forEach((element)=>{element.classList.add("hidden")})
+        startButton.classList.add("hidden")
+
+        // Hide top score message after 3 seconds
+        setTimeout(()=>{
+            message.classList.add("hidden")
+            document.querySelectorAll(".score-board").forEach((element)=>{element.classList.remove("hidden")})
+            startButton.classList.remove("hidden")
+        }, 3000) 
+        
+        showElf("You got a new high score!")
+      }
+
+
+      whackContainer.classList.add("hidden")
+      startButton.textContent = "Start Game";
+    }, 20000);
+  });
+})();
+</script>
