@@ -68,24 +68,24 @@
 </div>
 
 <style>
-    .screen::-webkit-scrollbar {
+    *::-webkit-scrollbar {
         width: 6px;
         /* thinner */
     }
 
-    .screen::-webkit-scrollbar-track {
+    *::-webkit-scrollbar-track {
         background: #000;
         border-left: 1px solid #003300;
     }
 
-    .screen::-webkit-scrollbar-thumb {
+    *::-webkit-scrollbar-thumb {
         background: #39ff14;
         box-shadow: 0 0 6px #39ff14;
         border-radius: 4px;
         border: 1px solid #0f0;
     }
 
-    .screen::-webkit-scrollbar-thumb:hover {
+    *::-webkit-scrollbar-thumb:hover {
         background: #66ff66;
         box-shadow: 0 0 10px #66ff66;
     }
@@ -379,10 +379,16 @@
             }
             isTypingLines = false;
             let index = 0;
-            storyTextEl.textContent = "";
+            storyTextEl.innerHTML = ""; // clear only at the start of a chapter
+            //storyTextEl.textContent = "";
+           
 
             function typeLine() {
                 if (index >= lines.length) { if (callback) callback(); if (isTypingLines) typeLines(isTypingLines); return; }
+                const lineEl = document.createElement("div");
+                lineEl.classList.add("story-line");
+                storyTextEl.appendChild(lineEl);
+
                 let i = 0;
                 let line = lines[index];
                 let buffer = "";
@@ -390,11 +396,12 @@
                 function typeChar() {
                     if (i < line.length) {
                         buffer += line[i];
-                        storyTextEl.textContent = buffer;
+                        storyTextEl.parentElement.scrollTop =  storyTextEl.parentElement.scrollHeight
+                        lineEl.textContent = buffer;
                         i++;
                         setTimeout(typeChar, 75);
                     } else {
-                        storyTextEl.textContent += "\n";
+                        lineEl.textContent += "\n";
                         index++;
                         setTimeout(typeLine, 1500);
                     }
